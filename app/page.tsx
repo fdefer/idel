@@ -1,15 +1,18 @@
-import Link from 'next/link';
+"use client";
+
+import dynamic from "next/dynamic";
+
+const LazyMap = dynamic(() => import("@/components/Map"), {
+  ssr: false,
+  loading: () => <p>Loading...</p>,
+});
 
 export default function Home() {
   return (
     <main>
-      <h1>Welcome!</h1>
-        <div>
-          <Link href="/books">Go to Books Page</Link>
-        </div>
-        <div>
-          <Link href="/about">Go to About Page</Link>
-        </div>
+      <LazyMap />
     </main>
   );
 }
+
+
