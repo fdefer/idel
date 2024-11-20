@@ -13,6 +13,7 @@
     "leaflet": "^1.9.4",
     "leaflet-defaulticon-compatibility": "^0.1.2",
     "leaflet-geosearch": "^4.0.0",
+    "leaflet-providers": "^2.0.0",
     "mongodb": "^6.10.0",
     "mongoose": "^8.8.1",
     "next": "^14.2.17",
