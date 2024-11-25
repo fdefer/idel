@@ -5,11 +5,13 @@ import "leaflet-defaulticon-compatibility/dist/leaflet-defaulticon-compatibility
 import "leaflet-defaulticon-compatibility";
 import { MapContainer, TileLayer, GeoJSON, useMap } from "react-leaflet";
 import { useEffect, useState, useRef } from "react";
+import * as turf from "@turf/turf";
 
 export default function Map() {
   const [provincesData, setProvincesData] = useState(null);
   const [municipalitiesData, setMunicipalitiesData] = useState(null);
   const [showMunicipalities, setShowMunicipalities] = useState(false);
+  const [filteredMunicipalities, setFilteredMunicipalities] = useState(null);
   const clickedProvince = useRef<L.Polygon | null>(null);
 
   // Fetch the province and municipality data on component mount
@@ -34,10 +36,10 @@ export default function Map() {
   const MapEvents = () => {
     const map = useMap(); // Get the map reference from the context
 
-    const defaultStyle = {
+    const whiteStyle = {
       color: "#9b4dca",
       weight: 3,
-      fillColor: "#8cf5a3",
+      fillColor: "white",
       fillOpacity: 0.8,
     };
 
@@ -46,9 +48,11 @@ export default function Map() {
       fillOpacity: 0.4,
     };
 
-    const clickedStyle = {
-      fillColor: "#f0e68c",
-      fillOpacity: 0.9,
+    const municipalityStyle = {
+      color: "#9b4dca",
+      weight: 3,
+      fillColor: "#007bff",
+      fillOpacity: 0.4,
     };
 
     const onMouseOver = (e) => {
@@ -58,37 +62,31 @@ export default function Map() {
     };
 
     const onMouseOut = (e) => {
-      if (e.target === clickedProvince.current) {
-        e.target.setStyle(clickedStyle);
-      } else {
-        e.target.setStyle(defaultStyle);
-      }
-    };
-
-    const changeStyle = (clickedLayer) => {
-      if (clickedProvince.current === clickedLayer) {
-        clickedLayer.setStyle(defaultStyle);
-        clickedProvince.current = null;
-        return;
-      }
-
-      if (clickedProvince.current) {
-        clickedProvince.current.setStyle(defaultStyle);
-      }
-
-      clickedProvince.current = clickedLayer;
-      clickedLayer.setStyle(clickedStyle);
+      e.target.setStyle(whiteStyle);
     };
 
     const onClick = (e) => {
       const clickedLayer = e.target;
 
-      changeStyle(clickedLayer);
+      clickedProvince.current = clickedLayer;
+      clickedLayer.setStyle(whiteStyle);
 
       const bounds = clickedLayer.getBounds();
-      map.fitBounds(bounds); // Zoom to the clicked province
+      map.fitBounds(bounds);
 
-      setShowMunicipalities(true);
+      if (municipalitiesData) {
+        const provincePolygon = turf.polygon(clickedProvince.current.feature.geometry.coordinates[0]);
+        const filtered = {
+          type: "FeatureCollection",
+          features: municipalitiesData.features.filter((municipality) => {
+            if (!municipality.geometry || !municipality.geometry.coordinates) return false;
+
+            const centroid = turf.centroid(municipality); // Get the centroid of the municipality
+            return turf.booleanPointInPolygon(centroid, provincePolygon); // Check if within province
+          }),
+        }
+        setFilteredMunicipalities(filtered);
+      }
     };
 
     const onEachProvince = (feature, layer) => {
@@ -101,23 +99,23 @@ export default function Map() {
   
     const onEachMunicipality = (feature, layer) => {
       layer.on({
-        mouseover: onMouseOver,
-        mouseout: onMouseOut,
-        click: changeStyle(layer),
+        //mouseover: onMouseOver,
+        //mouseout: onMouseOut,
+        //click: changeStyle(layer),
       });
     };
 
     return (
       <>
         <GeoJSON
-          style={defaultStyle}
+          style={whiteStyle}
           data={provincesData}
           onEachFeature={onEachProvince}
         />
-        {showMunicipalities && municipalitiesData && (
+        {filteredMunicipalities && (
           <GeoJSON
-            style={defaultStyle}
-            data={municipalitiesData}
+            style={municipalityStyle}
+            data={filteredMunicipalities}
             onEachFeature={onEachMunicipality}
           />
         )}
@@ -141,5 +139,3 @@ export default function Map() {
     </MapContainer>
   );
 }
-
-
