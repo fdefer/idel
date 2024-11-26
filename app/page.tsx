@@ -2,9 +2,8 @@
 
 import dynamic from "next/dynamic";
 
-const LazyMap = dynamic(() => import("@/components/Map"), {
+const LazyMap = dynamic(() => import("@/components/MapContainer"), {
   ssr: false,
-  loading: () => <p>Loading...</p>,
 });
 
 export default function Home() {
