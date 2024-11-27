@@ -1,5 +1,5 @@
 import { useMap } from "react-leaflet";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { filterMunicipalities } from "../utils/geoUtils";
 import { provinceStyle, municipalityStyle, hoverStyle } from "./styles"
 import GeoJSONLayers from "./GeoJSONLayers";
