@@ -1,3 +1,10 @@
+export const communitiesStyle = {
+    color: "red",
+    weight: 3,
+    fillColor: "white",
+    fillOpacity: 0.8,
+};
+
 export const provinceStyle = {
     color: "#9b4dca",
     weight: 3,

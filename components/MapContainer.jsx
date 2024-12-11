@@ -8,10 +8,18 @@ import MapEvents from "./MapEvents";
 import { useEffect, useState } from "react";
 
 export default function Map() {
+  const [communitiesData, setCommunitiesData] = useState(null);
   const [provincesData, setProvincesData] = useState(null);
   const [municipalitiesData, setMunicipalitiesData] = useState(null);
 
   useEffect(() => {
+
+    const fetchCommunitiesData = async () => {
+      const response = await fetch("/data/spain_communities.geojson");
+      const data = await response.json();
+      setCommunitiesData(data);
+    }
+
     const fetchProvincesData = async () => {
       const response = await fetch("/data/spain_provinces.geojson");
       const data = await response.json();
@@ -24,11 +32,12 @@ export default function Map() {
       setMunicipalitiesData(data);
     };
 
+    fetchCommunitiesData();
     fetchProvincesData();
     fetchMunicipalitiesData();
   }, []);
 
-  if (provincesData && municipalitiesData) {
+  if (communitiesData && provincesData && municipalitiesData) {
 
     return (
       <LeafletMap
@@ -43,6 +52,7 @@ export default function Map() {
           attribution='Tiles &copy; Esri &mdash; Source: Esri'
         />
         <MapEvents
+          communitiesData={communitiesData}
           provincesData={provincesData}
           municipalitiesData={municipalitiesData}
         />
