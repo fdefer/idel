@@ -1,23 +1,50 @@
 import { useMap } from "react-leaflet";
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { filterMunicipalities } from "../utils/geoUtils";
-import { communitiesStyle, provinceStyle, municipalityStyle, hoverStyle } from "./styles"
+import { communitiesStyle, provinceStyle, municipalityStyle, hoverStyle, whiteStyle } from "./styles"
 import GeoJSONLayers from "./GeoJSONLayers";
 
 export default function MapEvents({ communitiesData, provincesData, municipalitiesData }) {
   const map = useMap();
   const [filteredProvinces, setFilteredProvinces] = useState(null);
   const [filteredMunicipalities, setFilteredMunicipalities] = useState(null);
+  const clickedCommunity = useRef(null);
+  const clickedProvince = useRef(null);
 
   const onMouseOver = (e) => e.target.setStyle(hoverStyle);
-  const onMouseOutCommunity = (e) => e.target.setStyle(communitiesStyle);
-  const onMouseOutProvince = (e) => e.target.setStyle(provinceStyle);
+  const onMouseOutCommunity = (e) => {
+    if (clickedCommunity.current !== e.target) {
+      e.target.setStyle(communitiesStyle);
+    }
+  };
+  const onMouseOutProvince = (e) => {
+    if (clickedProvince.current !== e.target) {
+      e.target.setStyle(provinceStyle);
+    }
+  };
   const onMouseOutMunicipality = (e) => e.target.setStyle(municipalityStyle);
 
+  function resetCommunityColor(clickedLayer)  {
+    if (clickedCommunity.current !== null) {
+      clickedCommunity.current.setStyle(communitiesStyle);
+    }
+    clickedCommunity.current = clickedLayer;
+    clickedLayer.setStyle(whiteStyle)
+  }
+
+  function resetProvinceColor(clickedLayer)  {
+    if (clickedProvince.current !== null) {
+      clickedProvince.current.setStyle(provinceStyle);
+    }
+    clickedProvince.current = clickedLayer;
+    clickedLayer.setStyle(whiteStyle)
+  }
   
   const onClickCommunities = (e) => {
     setFilteredMunicipalities(null);
     const clickedLayer = e.target;
+
+    resetCommunityColor(clickedLayer);
 
     const bounds = clickedLayer.getBounds();
     map.fitBounds(bounds);
@@ -29,6 +56,8 @@ export default function MapEvents({ communitiesData, provincesData, municipaliti
 
   const onClickProvince = (e) => {
     const clickedLayer = e.target;
+
+    resetProvinceColor(clickedLayer);
 
     const bounds = clickedLayer.getBounds();
     map.fitBounds(bounds);
