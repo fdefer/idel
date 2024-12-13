@@ -1,6 +1,6 @@
 
 import { GeoJSON } from "react-leaflet";
-import { communitiesStyle, provinceStyle, municipalityStyle,} from "./styles";
+import { communitiesStyle, provinceStyle, municipalityStyle,} from "../styles/styles";
 
 export default function GeoJSONLayers({ communitiesData, filteredProvinces, filteredMunicipalities, onEachCommunity, onEachProvince, onEachMunicipality }) {
   return (
