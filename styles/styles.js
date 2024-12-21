@@ -18,9 +18,9 @@ export const hoverStyle = {
 };
   
 export const municipalityStyle = {
-    color: "#9b4dca",
+    color: "black",
     weight: 3,
-    fillColor: "#007bff",
+    fillColor: "#9cff57",
     fillOpacity: 0.4,
 };
 
